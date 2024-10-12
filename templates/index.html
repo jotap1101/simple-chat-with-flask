@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hashzap</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #top-bar {
+            background-color: #075E54;
+            color: #FFF;
+            padding: 10px;
+            text-align: center;
+        }
+
+        #chat-container {
+            padding: 10px;
+            height: calc(100vh - 150px);
+            overflow-y: scroll;
+        }
+
+        #chat-container p {
+            background-color: #DCF8C6;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        #input-container {
+            display: flex;
+            align-items: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #F4F4F4;
+            padding: 10px;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #input-container input[type="text"] {
+            padding: 10px;
+            border: none;
+            outline: none;
+            flex: 1;
+        }
+
+        #input-container input#usuario {
+            margin-right: 10px;
+            width: 30%;
+        }
+
+        #input-container input#mensagem {
+            flex: 1;
+        }
+
+        #input-container button {
+            padding: 10px 20px;
+            background-color: #075E54;
+            color: #FFF;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="top-bar">
+        <h1>Hashzap</h1>
+    </div>
+
+    <div id="chat-container">
+        <p>Welcome to Hashzap!</p>
+    </div>
+
+    <div id="input-container">
+        <input type="text" name="" id="user" placeholder="User" required>
+
+        <div style="width: 10px;"></div>
+
+        <input type="text" name="" id="message" placeholder="Message" required>
+
+        <button id="send-button">Send</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.0/socket.io.js" integrity="sha512-OovVc8Xk/+ils70VE978+ILm2IvIisZskNCaDvaTtXt7a2O3eioYv8SVKfjdVU1za9Ir/KHIqweNEGLLFk6bdw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        $(document).ready(function() {
+            var socket = io('localhost:5000');
+
+            socket.on('connect', function() {
+                console.log('Conectado');
+            });
+
+            socket.on('disconnect', function() {
+                console.log('Desconectado');
+            });
+
+            socket.on('message', function(data) {
+                console.log(data);
+
+                $('#chat-container').append($('<p>').text(data));
+                
+                $('#chat-container').scrollTop($('#chat-container')[0].scrollHeight);
+            });
+
+            $('#send-button').on('click', function() {
+                console.log('Enviando mensagem');
+
+                socket.send($('#user').val() + ': ' + $('#message').val());
+
+                $('#message').val('');
+            });
+
+            $('#message').on('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    socket.send($('#user').val() + ': ' + $('#message').val());
+
+                    $('#message').val('');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
